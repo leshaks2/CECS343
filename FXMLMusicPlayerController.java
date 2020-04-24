@@ -77,6 +77,7 @@ public class FXMLMusicPlayerController implements Initializable{
             nowPlaying.setText("Now Playing... " + songPlaying);
             albumCover.setImage(albumArt);
             playANDpause.setText("||");
+            endDuration.setText(formatTime(mediaPlayer.getMedia().getDuration()));
         }
         else if(mpStatus == Status.PLAYING){
             mediaPlayer.pause();
@@ -97,7 +98,6 @@ public class FXMLMusicPlayerController implements Initializable{
                File albumCoverArt = new File("C:\\Users\\joshu\\Desktop\\iridescence\\iridescence.png");
             if(albumCoverArt.exists()){
                albumArt = new Image (albumCoverArt.toURI().toString());
-               endDuration.setText(formatTime(mediaPlayer.getMedia().getDuration()));
                //mediaPlayer.setAutoPlay(true);
                //nowPlaying.setText("Now Playing... " + searchBar.getText());
             }
@@ -122,6 +122,9 @@ public class FXMLMusicPlayerController implements Initializable{
         System.out.println("musicplayer.FXMLMusicPlayerController.formatTime()");
         int minutes = (int)Math.floor(time/60);
         int seconds = time % 60;
+        if (seconds < 10) {
+            return String.format("%d:0%d", minutes, seconds);
+        }
         return String.format("%d:%d", minutes, seconds);
     }
     
@@ -132,6 +135,7 @@ public class FXMLMusicPlayerController implements Initializable{
             public void invalidated(Observable ov) {
                if (progressBar.isValueChanging()) {
                   mediaPlayer.seek(mediaPlayer.getMedia().getDuration().multiply(progressBar.getValue() / 100.0));
+                  
                 }
             }
         });
@@ -145,9 +149,6 @@ public class FXMLMusicPlayerController implements Initializable{
             }
         });
 
-        
-        
     }
-        
-        
+                
 }
