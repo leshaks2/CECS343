@@ -23,6 +23,7 @@ public class MusicPlayer extends Application {
         
         Scene scene = new Scene(root);
         
+        stage.setTitle("Music Player");
         stage.setScene(scene);
         stage.show();  
     }

@@ -13,7 +13,9 @@ import javafx.event.EventHandler;
 import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -23,6 +25,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 public class FXMLMusicPlayerController implements Initializable{
     
@@ -51,14 +56,8 @@ public class FXMLMusicPlayerController implements Initializable{
     private Label nowPlaying;
 
     @FXML
-    private TextField searchBar;
-
-    @FXML
     private Button searchButton;
-    
-    @FXML
-    private TextField songValid;
-    
+
     @FXML
     private Label playTime;
 
@@ -77,6 +76,7 @@ public class FXMLMusicPlayerController implements Initializable{
             nowPlaying.setText("Now Playing... " + songPlaying);
             albumCover.setImage(albumArt);
             playANDpause.setText("||");
+            endDuration.setText(formatTime(mediaPlayer.getMedia().getDuration()));
         }
         else if(mpStatus == Status.PLAYING){
             mediaPlayer.pause();
@@ -87,23 +87,33 @@ public class FXMLMusicPlayerController implements Initializable{
 
     
     @FXML
-    void searchButtonAction(ActionEvent event) throws IOException {
-       File search = new File("C:\\Users\\joshu\\Desktop\\iridescence\\" + searchBar.getText() + ".mp3");
-            if(search.exists()){            
-               songValid.setText("O");
-               media = new Media(search.toURI().toString());
-               mediaPlayer = new MediaPlayer(media);
-               songPlaying = searchBar.getText();
-               File albumCoverArt = new File("C:\\Users\\joshu\\Desktop\\iridescence\\iridescence.png");
-            if(albumCoverArt.exists()){
-               albumArt = new Image (albumCoverArt.toURI().toString());
-               endDuration.setText(formatTime(mediaPlayer.getMedia().getDuration()));
-               //mediaPlayer.setAutoPlay(true);
-               //nowPlaying.setText("Now Playing... " + searchBar.getText());
-            }
-            else{
-               songValid.setText("X");
-            }
+    void searchButtonAction(ActionEvent event){
+//       File search = new File("C:\\Users\\joshu\\Desktop\\iridescence\\" + searchBar.getText() + ".mp3");
+//            if(search.exists()){            
+//               songValid.setText("O");
+//               media = new Media(search.toURI().toString());
+//               mediaPlayer = new MediaPlayer(media);
+//               songPlaying = searchBar.getText();
+//               File albumCoverArt = new File("C:\\Users\\joshu\\Desktop\\iridescence\\iridescence.png");
+//            if(albumCoverArt.exists()){
+//               albumArt = new Image (albumCoverArt.toURI().toString());
+//               //mediaPlayer.setAutoPlay(true);
+//               //nowPlaying.setText("Now Playing... " + searchBar.getText());
+//            }
+//            else{
+//               songValid.setText("X");
+//            }
+//        }
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLMusicSearch.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.setTitle("Music Search");
+            stage.setScene(new Scene(root1));
+            stage.show();
+
+        }catch (Exception e){
+            System.out.println("Can't load new window.");
         }
     }
     
@@ -122,6 +132,9 @@ public class FXMLMusicPlayerController implements Initializable{
         System.out.println("musicplayer.FXMLMusicPlayerController.formatTime()");
         int minutes = (int)Math.floor(time/60);
         int seconds = time % 60;
+        if (seconds < 10) {
+            return String.format("%d:0%d", minutes, seconds);
+        }
         return String.format("%d:%d", minutes, seconds);
     }
     
@@ -132,6 +145,7 @@ public class FXMLMusicPlayerController implements Initializable{
             public void invalidated(Observable ov) {
                if (progressBar.isValueChanging()) {
                   mediaPlayer.seek(mediaPlayer.getMedia().getDuration().multiply(progressBar.getValue() / 100.0));
+                  
                 }
             }
         });
@@ -145,9 +159,6 @@ public class FXMLMusicPlayerController implements Initializable{
             }
         });
 
-        
-        
     }
-        
-        
+                
 }
