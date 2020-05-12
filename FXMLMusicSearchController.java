@@ -20,14 +20,15 @@ import javafx.scene.control.TextField;
  * @author QUIBIN
  */
 public class FXMLMusicSearchController implements Initializable {
-
+    
+    
     /**
      * Initializes the controller class.
      * @param url
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        
     }    
     
     @FXML
@@ -38,6 +39,5 @@ public class FXMLMusicSearchController implements Initializable {
 
     @FXML
     void searchButtonAction(ActionEvent event) {
-        
     }
 }

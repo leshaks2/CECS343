@@ -5,6 +5,11 @@
  */
 package musicplayer;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -32,7 +37,23 @@ public class MusicPlayer extends Application {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        launch(args);
+    String DB_URL = "jdbc:derby://localhost:1527/musicdb";
+    Connection conn = null;
+    PreparedStatement pstmt;
+    try {
+            System.out.println("Connecting to the Database");
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            conn = DriverManager.getConnection(DB_URL, "app", "app");
+            System.out.println("Database Connection Open");
+            String sql = "SELECT title FROM song INNER JOIN artist a on song.artist = a.artist_id WHERE a.artist_name = 'BROCKHAMPTON'"; 
+            pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery();
+            if(rs.next()){
+                System.out.println(rs.getString("title"));
+            }
+        } catch (Exception e){
+            System.out.println(e);
+        }
+    launch(args);
     }
-    
 }
