@@ -66,6 +66,24 @@ public class FXMLMusicPlayerController implements Initializable{
     
     @FXML
     private ImageView albumCover;
+    
+     @FXML
+    private Button queueButton;
+
+    @FXML
+    void queueButtonAction(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLMusicQueue.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.setTitle("Music Queue");
+            stage.setScene(new Scene(root1));
+            stage.show();
+
+        }catch (Exception e){
+            System.out.println("Can't load new window.");
+        }
+    }
 
     @FXML
     void playANDpauseButtonAction(ActionEvent event) {

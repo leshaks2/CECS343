@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane id="AnchorPane" prefHeight="550.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="musicplayer.FXMLMusicQueueController">
+   <children>
+      <TableView fx:id="songQueueTable" layoutX="25.0" layoutY="64.0" prefHeight="450.0" prefWidth="900.0">
+        <columns>
+          <TableColumn fx:id="songID" minWidth="0.0" prefWidth="0.0" text="SONG_ID" />
+          <TableColumn fx:id="album" minWidth="0.0" prefWidth="240.0" text="ALBUM" />
+            <TableColumn fx:id="songTitle" minWidth="0.0" prefWidth="240.0" text="SONG TITLE" />
+            <TableColumn fx:id="artist" minWidth="0.0" prefWidth="240.0" text="ARTIST" />
+            <TableColumn fx:id="genre" text="GENRE" />
+            <TableColumn fx:id="songLength" prefWidth="100.0" text="SONG_LENGTH" />
+        </columns>
+      </TableView>
+      <Label fx:id="songPlaying" layoutX="25.0" layoutY="14.0" text="SONG PLAYING: " />
+      <Label fx:id="nextSong" layoutX="25.0" layoutY="38.0" text="NEXT SONG:" />
+   </children>
+</AnchorPane>
