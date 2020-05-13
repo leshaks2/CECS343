@@ -3,24 +3,27 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package musicloginregister;
-
+package musicplayer;
+import java.sql.*;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-1import javax.swing.JOptionPane;
+import javax.swing.JOptionPane;
 /**
  *
  * @author matth
  */
 public class RegisterForm extends javax.swing.JFrame {
-
+Connection cnx = My_CNX.getConnection();
+PreparedStatement ps = null;
+ResultSet rs = null;
     /**
      * Creates new form RegisterForm
      */
     public RegisterForm() {
         initComponents();
+        My_CNX.getConnection();
     }
 
     /**
@@ -183,26 +186,20 @@ public class RegisterForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField_USERActionPerformed
 
     private void jButtonRegisterMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonRegisterMouseClicked
-
-        String username = jTextField_USER.getText();
-        String pass = String.valueOf(jPasswordField_PASS.getPassword());
-        String repass = String.valueOf(jPasswordField_REPASS.getPassword());
-        
-        PreparedStatement ps;
-        
-        String query = "INSERT INTO `users`(`username`,`password`) VALUES (?,?)";
-        
-        try {
-            ps = My_CNX.getConnection().prepareStatement(query);
+       String query = "INSERT INTO login (login_name, password) VALUES (?,?)";
+       String pass = String.valueOf(jPasswordField_PASS.getPassword());
+       
+       try {
+            ps = cnx.prepareStatement(query);
             
-            ps.setString(1,username);
+            ps.setString(1, jTextField_USER.getText());
             ps.setString(2, pass);
             
             if(ps.executeUpdate() > 0){
                 JOptionPane.showMessageDialog(null, "New User Added");
             }
         } catch (SQLException ex) {
-            Logger.getLogger(RegisterForm.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, ex);
         }
         
         LoginForm y = new LoginForm();

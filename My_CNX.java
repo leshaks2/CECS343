@@ -3,14 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package musicloginregister;
-
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+package musicplayer;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -19,15 +17,13 @@ import java.sql.DriverManager;
 public class My_CNX {
     
     public static Connection getConnection(){
-        Connection cnx = null;
-        
+          Connection cnx = null;
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            cnx = DriverManager.getConnection("jdbc:mysql://localhost/music_login", "root", "");
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            cnx = DriverManager.getConnection("jdbc:derby://localhost:1527/musicDB","app","app");
+            return cnx;
+        } catch (SQLException ex) {
+            Logger.getLogger(My_CNX.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        return cnx;
+        return null;
     }
 }
