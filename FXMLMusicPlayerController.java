@@ -3,6 +3,8 @@ package musicplayer;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.time.Clock;
 import javafx.util.Duration;
 import java.util.ResourceBundle;
@@ -27,15 +29,16 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
+import static musicplayer.FXMLMusicQueueController.oblist;
 
 public class FXMLMusicPlayerController implements Initializable{
     
-    private MediaPlayer mediaPlayer; 
-    private Media media;
+    static private MediaPlayer mediaPlayer; 
+    static private Media media;
+    static private Image albumArt;
     private Status mpStatus;
-    private Image albumArt;
-    private String songPlaying;
     
     @FXML
     private Button playANDpause;
@@ -53,7 +56,10 @@ public class FXMLMusicPlayerController implements Initializable{
     private Slider volumeSlider;
 
     @FXML
-    private Label nowPlaying;
+    private static Label nowPlaying;
+    
+    @FXML
+    private static Label artistPlaying;
 
     @FXML
     private Button searchButton;
@@ -62,10 +68,10 @@ public class FXMLMusicPlayerController implements Initializable{
     private Label playTime;
 
     @FXML
-    private Label endDuration;
+    private static Label endDuration;
     
     @FXML
-    private ImageView albumCover;
+    private static ImageView albumCover;
     
      @FXML
     private Button queueButton;
@@ -91,14 +97,12 @@ public class FXMLMusicPlayerController implements Initializable{
         
         if(mpStatus == Status.PAUSED || mpStatus == Status.STOPPED || mpStatus == Status.READY){
             mediaPlayer.play();
-            nowPlaying.setText("Now Playing... " + songPlaying);
-            albumCover.setImage(albumArt);
+//            albumCover.setImage(albumArt);
             playANDpause.setText("||");
-            endDuration.setText(formatTime(mediaPlayer.getMedia().getDuration()));
+//            endDuration.setText(formatTime(mediaPlayer.getMedia().getDuration()));
         }
         else if(mpStatus == Status.PLAYING){
             mediaPlayer.pause();
-            nowPlaying.setText("Now Paused... " + songPlaying);
             playANDpause.setText(">");
         }        
     }
@@ -134,6 +138,71 @@ public class FXMLMusicPlayerController implements Initializable{
             System.out.println("Can't load new window.");
         }
     }
+    
+    public static String findSongFile(String songID){
+        try {
+            String songFile = null;
+            Connection conn = DBConnect.connectDB();
+            String sql = "SELECT song_file FROM song WHERE song_id = " + songID;
+            ResultSet rs = conn.prepareStatement(sql).executeQuery();
+            while (rs.next()) {
+                songFile = rs.getString("song_file");
+            }
+            return songFile;
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return null;
+    }
+    
+    public static String findAlbumCover(String songID){
+        try {
+            String albumFile = null;
+            Connection conn = DBConnect.connectDB();
+            String sql = "SELECT album_cover \n" +
+            "FROM album\n" +
+            "INNER JOIN song s on album.album_id = s.album\n" +
+            "WHERE song_id = " + songID;
+            ResultSet rs = conn.prepareStatement(sql).executeQuery();
+            while (rs.next()) {
+                albumFile = rs.getString("album_cover");
+            }
+            return albumFile;
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return null;
+    }
+    
+    
+    public static void newSong(String songFile, String album, String artistName, String title, String songLength){
+        System.out.println(songFile);
+        System.out.println(album);
+        System.out.println(artistName);
+        System.out.println(title);
+        System.out.println(songLength);
+        File search = new File(songFile);
+        if(search.exists()){
+            System.out.println("SEARCH EXISTS");
+            media = new Media(search.toURI().toString());
+            mediaPlayer = new MediaPlayer(media);
+//            endDuration.setText(songLength);
+            File albumCoverArt = new File(album);
+            if(albumCoverArt.exists()){
+                System.out.println("COVER EXISTS");
+                albumArt = new Image (albumCoverArt.toURI().toString());
+//          albumCover.setImage(albumArt);
+            }
+//          nowPlaying.setText(title);
+//          artistPlaying.setText(artistName);
+            mediaPlayer.stop();
+            mediaPlayer.setAutoPlay(true);
+        }    
+        else{
+            
+        }
+    }
+    
     
     @FXML
     void skipBackButtonAction(ActionEvent event) {
