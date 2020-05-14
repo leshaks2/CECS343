@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package musicplayer;
 
 /**
@@ -10,23 +5,23 @@ package musicplayer;
  * @author QUIBIN
  */
 public class ModelTable {
-    String song_id, album, title, artist, genre, song_length;
+    String songID, album, title, artist, genre, songLength;
 
-    public ModelTable(String song_id, String album, String title, String artist, String genre, String song_length) {
-        this.song_id = song_id;
+    public ModelTable(String songID, String album, String title, String artist, String genre, String songLength) {
+        this.songID = songID;
         this.album = album;
         this.title = title;
         this.artist = artist;
         this.genre = genre;
-        this.song_length = song_length;
+        this.songLength = songLength;
     }
 
-    public String getSong_id() {
-        return song_id;
+    public String getSongID() {
+        return songID;
     }
 
-    public void setSong_id(String song_id) {
-        this.song_id = song_id;
+    public void setSongID(String songID) {
+        this.songID = songID;
     }
 
     public String getTitle() {
@@ -61,12 +56,12 @@ public class ModelTable {
         this.album = album;
     }
 
-    public String getSong_length() {
-        return song_length;
+    public String getSongLength() {
+        return songLength;
     }
 
-    public void setSong_length(String song_length) {
-        this.song_length = song_length;
+    public void setSongLength(String songLength) {
+        this.songLength = songLength;
     }
     
     
