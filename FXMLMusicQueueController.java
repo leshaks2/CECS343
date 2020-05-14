@@ -45,33 +45,37 @@ public class FXMLMusicQueueController implements Initializable {
 //        return songQueue;
 //    }
 //    
-    public static void addToSongQueue(ArrayList<String> s){
+    public static void addToSongQueue(String songID){
         try{
-            oblist.clear();
+            int queueNumber;
             Connection conn = DBConnect.connectDB();
-            for (int i = 0; i < s.size(); i++){
-                String sql = "SELECT * FROM SONGS_VW WHERE SONGS_VW.song_id = " + Integer.parseInt(s.get(i));
+                String sql = "SELECT MAX(POSITION) FROM QUEUE";
                 ResultSet rs = conn.prepareStatement(sql).executeQuery();
-                while (rs.next()) {
-                    System.out.println(rs.getString("song_id"));
-                    System.out.println(rs.getString("album"));
-                    System.out.println(rs.getString("title"));
-                    System.out.println(rs.getString("artist"));
-                    System.out.println(rs.getString("genre"));
-                    System.out.println(rs.getString("song_length"));
+                if(rs.next()) {
+                    queueNumber = rs.getInt(1);
+                    queueNumber ++;
+                }
+                else{
+                    queueNumber = 1;
+                }
+                sql = "INSERT INTO QUEUE(position, song) VALUES (" + queueNumber + ", "
+                + songID + ")";
+                conn.prepareStatement(sql).executeUpdate();
+                sql = "SELECT * FROM songs_vw s \n" +
+                "INNER JOIN queue q on s.song_id = q.song ORDER BY position";
+                rs = conn.prepareStatement(sql).executeQuery();
+                while (rs.next()){
                     oblist.add(new ModelTable(rs.getString("song_id"), rs.getString("album"),  
                     rs.getString("title"), rs.getString("artist"),
                     rs.getString("genre"), rs.getString("song_length")));
                 }
                 System.out.println(oblist.get(0).title);
-                songQueueTable.setItems(oblist);     
-            }
-           
+                songQueueTable.setItems(oblist);
         } catch(Exception e){
             e.printStackTrace();
         }
-        
     }
+        
     
     @FXML
     private static TableView<ModelTable> songQueueTable;

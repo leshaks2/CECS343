@@ -27,6 +27,7 @@
             <ContextMenu>
               <items>
                 <MenuItem mnemonicParsing="false" onAction="#handleAddToQueue" text="Add to Queue" />
+                  <MenuItem mnemonicParsing="false" onAction="#handlePlaySong" text="Play Song" />
               </items>
             </ContextMenu>
          </contextMenu>

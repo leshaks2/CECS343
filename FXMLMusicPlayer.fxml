@@ -11,7 +11,7 @@
       <Button fx:id="playANDpause" layoutX="465.0" layoutY="445.0" mnemonicParsing="false" onAction="#playANDpauseButtonAction" text="&gt;" />
       <Button fx:id="skipForward" layoutX="540.0" layoutY="445.0" mnemonicParsing="false" onAction="#skipForwardButtonAction" text="&gt;" />
       <Button fx:id="skipBack" layoutX="391.0" layoutY="445.0" mnemonicParsing="false" onAction="#skipBackButtonAction" text="&lt;" />
-      <Label fx:id="nowPlaying" layoutX="380.0" layoutY="407.0" prefHeight="17.0" prefWidth="195.0" />
+      <Label fx:id="nowPlaying" layoutX="380.0" layoutY="360.0" prefHeight="17.0" prefWidth="195.0" />
       <Button fx:id="searchButton" layoutX="23.0" layoutY="14.0" mnemonicParsing="false" onAction="#searchButtonAction" text="Search" />
       <Slider fx:id="progressBar" layoutX="363.0" layoutY="496.0" prefHeight="14.0" prefWidth="228.0" />
       <Slider fx:id="volumeSlider" layoutX="906.0" layoutY="457.0" orientation="VERTICAL" prefHeight="53.0" prefWidth="12.0" />
@@ -19,5 +19,6 @@
       <Label fx:id="endDuration" layoutX="598.0" layoutY="495.0" text="0:00" />
       <ImageView fx:id="albumCover" fitHeight="150.0" fitWidth="149.0" layoutX="403.0" layoutY="201.0" pickOnBounds="true" preserveRatio="true" />
       <Button fx:id="queueButton" layoutX="85.0" layoutY="14.0" mnemonicParsing="false" onAction="#queueButtonAction" text="Queue" />
+      <Label fx:id="artistPlaying" layoutX="380.0" layoutY="393.0" prefHeight="17.0" prefWidth="195.0" />
    </children>
 </AnchorPane>

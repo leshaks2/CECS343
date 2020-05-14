@@ -108,9 +108,12 @@ public class FXMLMusicSearchController implements Initializable {
             error.showAndWait();
         }
         else{
-            songIDQueue.add(selectedForAddition);
-            FXMLMusicQueueController.addToSongQueue(songIDQueue);
+            FXMLMusicQueueController.addToSongQueue(selectedForAddition);
+            
         }
+//            songIDQueue.add(selectedForAddition);
+//            FXMLMusicQueueController.addToSongQueue(songIDQueue);
+        
 //        Alert confirm = AlertMaker.AlertConfirmationMaker("Add to Queue", "Are you sure you want to add ? " 
 //                + selectedForAddition.getTitle() + " to queue?");
 //        Optional<ButtonType> answer = confirm.showAndWait();
@@ -121,6 +124,25 @@ public class FXMLMusicSearchController implements Initializable {
 //            Alert simple = AlertMaker.AlertSimpleMaker("Addition Cancelled", "Song Addition Cancelled");
 //            simple.showAndWait();
 //        }
+    }
+    
+    
+    @FXML
+    void handlePlaySong(ActionEvent event) {
+        selectedForAddition = SongResult.getSelectionModel().getSelectedItem().getSong_id();
+        
+        if(selectedForAddition == null){
+            Alert error = AlertMaker.AlertErrorMaker("No Song Selected", "Please Select a Song to Play");
+            error.showAndWait();
+        }
+        else{
+            String songFile = FXMLMusicPlayerController.findSongFile(selectedForAddition);
+            String albumCover = FXMLMusicPlayerController.findAlbumCover(selectedForAddition);
+            String songName = SongResult.getSelectionModel().getSelectedItem().getTitle();
+            String songLen = SongResult.getSelectionModel().getSelectedItem().getSong_length();
+            String artistName = SongResult.getSelectionModel().getSelectedItem().getArtist();
+            FXMLMusicPlayerController.newSong(songFile, albumCover, songName, artistName, songLen);
+        }
     }
     
     @FXML
