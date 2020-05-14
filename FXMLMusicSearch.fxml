@@ -14,7 +14,7 @@
       <TextField fx:id="searchBar" layoutX="33.0" layoutY="24.0" promptText="Search..." />
       <Button fx:id="searchButton" layoutX="192.0" layoutY="24.0" mnemonicParsing="false" onAction="#searchButtonAction" text="Search" />
       <Label layoutX="194.0" layoutY="162.0" prefHeight="17.0" prefWidth="562.0" />
-      <TableView fx:id="SongResult" layoutX="25.0" layoutY="73.0" prefHeight="450.0" prefWidth="900.0">
+      <TableView fx:id="SongResult" layoutX="25.0" layoutY="73.0" prefHeight="200.0" prefWidth="900.0">
         <columns>
           <TableColumn fx:id="songID" minWidth="0.0" prefWidth="0.0" text="SONG_ID" />
           <TableColumn fx:id="album" minWidth="0.0" prefWidth="240.0" text="ALBUM" />
@@ -31,6 +31,23 @@
             </ContextMenu>
          </contextMenu>
       </TableView>
-      <Button fx:id="queueButton" layoutX="253.0" layoutY="24.0" mnemonicParsing="false" onAction="#queueButtonAction" text="Queue" />
+      <TableView fx:id="songQueue" layoutX="25.0" layoutY="329.0" prefHeight="200.0" prefWidth="900.0">
+        <columns>
+          <TableColumn fx:id="queueSongID" minWidth="0.0" prefWidth="0.0" text="SONG_ID" />
+          <TableColumn fx:id="queueAlbum" prefWidth="240.0" text="ALBUM" />
+            <TableColumn fx:id="queueSongTitle" prefWidth="240.0" text="SONG TITLE" />
+            <TableColumn fx:id="queueArtist" prefWidth="240.0" text="ARTIST" />
+            <TableColumn fx:id="queueGenre" text="GENRE" />
+            <TableColumn fx:id="queueSongLength" prefWidth="100.0" text="SONG_LENGTH" />
+        </columns>
+         <contextMenu>
+            <ContextMenu>
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#handlePlaySong" text="Play Song" />
+              </items>
+            </ContextMenu>
+         </contextMenu>
+      </TableView>
+      <Label layoutX="442.0" layoutY="301.0" text="Song Queue" />
    </children>
 </AnchorPane>

@@ -1,25 +1,20 @@
 package musicplayer;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
-import java.time.Clock;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import javafx.util.Duration;
 import java.util.ResourceBundle;
-import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.event.ActionEvent; 
-import javafx.event.EventHandler; 
+import javafx.beans.InvalidationListener; 
 import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.media.Media;
@@ -27,15 +22,16 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
+
 public class FXMLMusicPlayerController implements Initializable{
-    
-    private MediaPlayer mediaPlayer; 
+    private static MediaPlayer mediaPlayer; 
     private Media media;
-    private Status mpStatus;
     private Image albumArt;
-    private String songPlaying;
+    private static Status mpStatus;
+    private static String newSongID = "";
     
     @FXML
     private Button playANDpause;
@@ -53,7 +49,10 @@ public class FXMLMusicPlayerController implements Initializable{
     private Slider volumeSlider;
 
     @FXML
-    private Label nowPlaying;
+    private static Label nowPlaying;
+    
+    @FXML
+    private static Label artistPlaying;
 
     @FXML
     private Button searchButton;
@@ -62,43 +61,140 @@ public class FXMLMusicPlayerController implements Initializable{
     private Label playTime;
 
     @FXML
-    private Label endDuration;
+    private static Label endDuration;
     
     @FXML
-    private ImageView albumCover;
+    private static ImageView albumCover;
     
-     @FXML
-    private Button queueButton;
+    @FXML
+    private Button refresh;
 
     @FXML
-    void queueButtonAction(ActionEvent event) {
+    void refreshButtonAction(ActionEvent event) {
+        if(!newSongID.equals("")){
+            File search = new File(findSongFile(newSongID));
+            if(search.exists()){
+                media = new Media(search.toURI().toString());
+                mediaPlayer = new MediaPlayer(media);
+                endDuration.setText(findSongLength(newSongID));
+                File albumCoverArt = new File(findAlbumCover(newSongID));
+                if(albumCoverArt.exists()){
+                    System.out.println("COVER EXISTS");
+                    albumArt = new Image (albumCoverArt.toURI().toString());
+              albumCover.setImage(albumArt);
+                }
+              nowPlaying.setText(findSongTitle(newSongID));
+              artistPlaying.setText(findArtist(newSongID));
+              playANDpause.setText(">");
+              newSongID = "";
+            }
+       }
+    }
+    
+    static void refresh(String songID){
+//        mpStatus = mediaPlayer.getStatus();
+//        if(mpStatus == Status.PLAYING){
+//            mediaPlayer.stop();
+//        }
+        newSongID = songID;
+    }
+    
+    public static String findSongFile(String songID){
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLMusicQueue.fxml"));
-            Parent root1 = (Parent) fxmlLoader.load();
-            Stage stage = new Stage();
-            stage.setTitle("Music Queue");
-            stage.setScene(new Scene(root1));
-            stage.show();
-
-        }catch (Exception e){
-            System.out.println("Can't load new window.");
+            String songFile = null;
+            Connection conn = DBConnect.connectDB();
+            String sql = "SELECT song_file FROM song WHERE song_id = " + songID;
+            ResultSet rs = conn.prepareStatement(sql).executeQuery();
+            while (rs.next()) {
+                songFile = rs.getString("song_file");
+                return songFile;
+            }
+        } catch (Exception e) {
+            System.out.println(e);
         }
+        return null;
     }
 
+    public static String findAlbumCover(String songID){
+        try {
+            String albumFile = null;
+            Connection conn = DBConnect.connectDB();
+            String sql = "SELECT album_cover FROM album INNER JOIN "
+                    + "song s on album.album_id = s.album WHERE song_id = " + 
+                    songID;
+            ResultSet rs = conn.prepareStatement(sql).executeQuery();
+            while (rs.next()) {
+                albumFile = rs.getString("album_cover");
+                return albumFile;
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return null;
+    }
+    
+    public static String findSongTitle(String songID){
+        try {
+            String songTitle = "";
+            Connection conn = DBConnect.connectDB();
+            String sql = "SELECT title FROM SONG WHERE song_id = " + songID;
+            ResultSet rs = conn.prepareStatement(sql).executeQuery();
+            if (rs.next()) {
+                songTitle = rs.getString("title");
+                return songTitle;
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return null;
+    }
+    
+    public static String findArtist(String songID){
+        try {
+            String songArtist = "";
+            Connection conn = DBConnect.connectDB();
+            String sql = "SELECT artist_name FROM artist "
+                    + "INNER JOIN song s on artist.artist_id = "
+                    + "s.artist WHERE song_id = " + songID;
+            ResultSet rs = conn.prepareStatement(sql).executeQuery();
+            if (rs.next()) {
+                songArtist = rs.getString("artist_name");
+                return songArtist;
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return null;
+    }
+    
+    public static String findSongLength(String songID){
+        try {
+            String songLength = "";
+            Connection conn = DBConnect.connectDB();
+            String sql = "SELECT song_length FROM SONG WHERE song_id = " + songID;
+            ResultSet rs = conn.prepareStatement(sql).executeQuery();
+            if (rs.next()) {
+                songLength = rs.getString("song_length");
+                return songLength;
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return null;
+    }
+    
     @FXML
     void playANDpauseButtonAction(ActionEvent event) {
         mpStatus = mediaPlayer.getStatus();
         
         if(mpStatus == Status.PAUSED || mpStatus == Status.STOPPED || mpStatus == Status.READY){
             mediaPlayer.play();
-            nowPlaying.setText("Now Playing... " + songPlaying);
-            albumCover.setImage(albumArt);
+//            albumCover.setImage(albumArt);
             playANDpause.setText("||");
-            endDuration.setText(formatTime(mediaPlayer.getMedia().getDuration()));
+//            endDuration.setText(formatTime(mediaPlayer.getMedia().getDuration()));
         }
         else if(mpStatus == Status.PLAYING){
             mediaPlayer.pause();
-            nowPlaying.setText("Now Paused... " + songPlaying);
             playANDpause.setText(">");
         }        
     }
@@ -106,22 +202,6 @@ public class FXMLMusicPlayerController implements Initializable{
     
     @FXML
     void searchButtonAction(ActionEvent event){
-//       File search = new File("C:\\Users\\joshu\\Desktop\\iridescence\\" + searchBar.getText() + ".mp3");
-//            if(search.exists()){            
-//               songValid.setText("O");
-//               media = new Media(search.toURI().toString());
-//               mediaPlayer = new MediaPlayer(media);
-//               songPlaying = searchBar.getText();
-//               File albumCoverArt = new File("C:\\Users\\joshu\\Desktop\\iridescence\\iridescence.png");
-//            if(albumCoverArt.exists()){
-//               albumArt = new Image (albumCoverArt.toURI().toString());
-//               //mediaPlayer.setAutoPlay(true);
-//               //nowPlaying.setText("Now Playing... " + searchBar.getText());
-//            }
-//            else{
-//               songValid.setText("X");
-//            }
-//        }
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLMusicSearch.fxml"));
             Parent root1 = (Parent) fxmlLoader.load();
@@ -142,22 +222,22 @@ public class FXMLMusicPlayerController implements Initializable{
 
     @FXML
     void skipForwardButtonAction(ActionEvent event) {
-
-    }
-    
-    String formatTime(Duration duration){
-        int time = (int)Math.floor(duration.toSeconds());
-        System.out.println("musicplayer.FXMLMusicPlayerController.formatTime()");
-        int minutes = (int)Math.floor(time/60);
-        int seconds = time % 60;
-        if (seconds < 10) {
-            return String.format("%d:0%d", minutes, seconds);
-        }
-        return String.format("%d:%d", minutes, seconds);
+//        try {
+//            Connection conn = DBConnect.connectDB();
+//            String sql = "SELECT position FROM queue WHERE song = "
+//            sql = "SELECT * FROM songs_vw s \n" +
+//            "INNER JOIN queue q on s.song_id = q.song ORDER BY position";
+//            ResultSet rsQueue = conn.prepareStatement(sql).executeQuery();
+//        }catch (Exception e){
+//            
+//        }
+//        
+//        
     }
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+    
         progressBar.valueProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable ov) {
