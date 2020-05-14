@@ -50,7 +50,7 @@ public class FXMLMusicQueueController implements Initializable {
             oblist.clear();
             Connection conn = DBConnect.connectDB();
             for (int i = 0; i < s.size(); i++){
-                String sql = "SELECT * FROM SONGS_VW WHERE SONGS_VW.song_id = " + Integer.parseInt(s.get(i));
+                String sql = "SELECT * FROM SONGS_VW WHERE SONGS_VW.song_id = " + s.get(i);
                 ResultSet rs = conn.prepareStatement(sql).executeQuery();
                 while (rs.next()) {
                     System.out.println(rs.getString("song_id"));

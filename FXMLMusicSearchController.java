@@ -123,6 +123,25 @@ public class FXMLMusicSearchController implements Initializable {
 //        }
     }
     
+    
+    @FXML
+    void handlePlaySong(ActionEvent event) {
+        selectedForAddition = SongResult.getSelectionModel().getSelectedItem().getSong_id();
+        
+        if(selectedForAddition == null){
+            Alert error = AlertMaker.AlertErrorMaker("No Song Selected", "Please Select a Song to Play");
+            error.showAndWait();
+        }
+        else{
+            String songFile = FXMLMusicPlayerController.findSongFile(selectedForAddition);
+            String albumCover = FXMLMusicPlayerController.findAlbumCover(selectedForAddition);
+            String songName = SongResult.getSelectionModel().getSelectedItem().title;
+            String songLen = SongResult.getSelectionModel().getSelectedItem().song_length;
+            String artistName = SongResult.getSelectionModel().getSelectedItem().artist;
+            FXMLMusicPlayerController.newSong(songFile, albumCover, songName, artistName, songLen);
+        }
+    }
+    
     @FXML
     void searchButtonAction(ActionEvent event) {
         if(searchBar.getText().equals("")){
