@@ -8,15 +8,18 @@ import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javafx.stage.Stage;
 
 /**
  *
  * @author matth
  */
 public class LoginForm extends javax.swing.JFrame {
-Connection cnx = My_CNX.getConnection();
-PreparedStatement ps = null;
-ResultSet rs = null;
+    Connection cnx = My_CNX.getConnection();
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    public static boolean test = false;
+    public static int user_id;
 
     /**
      * Creates new form LoginForm
@@ -25,6 +28,24 @@ ResultSet rs = null;
         initComponents();
         My_CNX.getConnection();
     }
+    
+    public void setTest(boolean test){
+        this.test = test;
+    }
+    
+    public boolean getTest(){
+        return test;
+    }
+    
+    
+    public void setUserID(int user_id){
+        this.user_id = user_id;
+    }
+    
+    public int getUserID(){
+        return user_id;
+    }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -199,7 +220,11 @@ ResultSet rs = null;
             rs = ps.executeQuery();
             
             if (rs.next()){
-                JOptionPane.showConfirmDialog(null, "Success");              
+                JOptionPane.showConfirmDialog(null, "Success");
+                user_id = rs.getInt("user_id");
+                setUserID(user_id);
+                setTest(true);
+                this.dispose();
             } else {
                 JOptionPane.showConfirmDialog(null, "Fail");
             }

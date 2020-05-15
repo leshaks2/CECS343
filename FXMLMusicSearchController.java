@@ -1,33 +1,20 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package musicplayer;
 
 import java.net.URL;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 
 /**
  * FXML Controller class
@@ -48,9 +35,15 @@ public class FXMLMusicSearchController implements Initializable {
         artist.setCellValueFactory(new PropertyValueFactory<>("artist"));
         genre.setCellValueFactory(new PropertyValueFactory<>("genre"));
         songLength.setCellValueFactory(new PropertyValueFactory<>("song_length"));
+        queueSongID.setCellValueFactory(new PropertyValueFactory<>("song_id"));
+        queueAlbum.setCellValueFactory(new PropertyValueFactory<>("album"));
+        queueSongTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
+        queueArtist.setCellValueFactory(new PropertyValueFactory<>("artist"));
+        queueGenre.setCellValueFactory(new PropertyValueFactory<>("genre"));
+        queueSongLength.setCellValueFactory(new PropertyValueFactory<>("song_length"));
     }    
-    
-    ObservableList<ModelTable> oblist = FXCollections.observableArrayList();
+    ObservableList<ModelTable> searchList = FXCollections.observableArrayList();
+    ObservableList<ModelTable> queueList = FXCollections.observableArrayList();
     ArrayList<String> songIDQueue = new ArrayList<>();
     static String selectedForAddition;
     
@@ -61,7 +54,7 @@ public class FXMLMusicSearchController implements Initializable {
     private Button searchButton;
 
     @FXML
-    private TableView<ModelTable> SongResult;
+    private TableView<ModelTable> songResult;
 
     @FXML
     private TableColumn<ModelTable, String> songID;
@@ -82,57 +75,76 @@ public class FXMLMusicSearchController implements Initializable {
     private TableColumn<ModelTable, String> songLength;
     
     @FXML
-    private Button queueButton;
+    private TableView<ModelTable> queue;
 
     @FXML
-    void queueButtonAction(ActionEvent event) {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLMusicQueue.fxml"));
-            Parent root1 = (Parent) fxmlLoader.load();
-            Stage stage = new Stage();
-            stage.setTitle("Music Queue");
-            stage.setScene(new Scene(root1));
-            stage.show();
+    private TableColumn<ModelTable, String> queueSongID;
 
-        }catch (Exception e){
-            System.out.println("Can't load new window.");
-        }
-    }
+    @FXML
+    private TableColumn<ModelTable, String> queueAlbum;
+
+    @FXML
+    private TableColumn<ModelTable, String> queueSongTitle;
+
+    @FXML
+    private TableColumn<ModelTable, String> queueArtist;
+
+    @FXML
+    private TableColumn<ModelTable, String> queueGenre;
+
+    @FXML
+    private TableColumn<ModelTable, String> queueSongLength;
+
+    
+    @FXML
+    private Button queueButton;
+
 
     @FXML
     public void handleAddToQueue(ActionEvent event) {
-        selectedForAddition = SongResult.getSelectionModel().getSelectedItem().getSong_id();
+        ModelTable selectedForQueue = songResult.getSelectionModel().getSelectedItem();
         
-        if(selectedForAddition == null){
+        if(selectedForQueue == null){
             Alert error = AlertMaker.AlertErrorMaker("No Song Selected", "Please Select a Song to Add to Queue");
             error.showAndWait();
         }
         else{
-            songIDQueue.add(selectedForAddition);
-            FXMLMusicQueueController.addToSongQueue(songIDQueue);
+            selectedForQueue = songResult.getSelectionModel().getSelectedItem();
+            queueList.add(new ModelTable(selectedForQueue.songID, selectedForQueue.album,  
+            selectedForQueue.title, selectedForQueue.artist,
+            selectedForQueue.genre, selectedForQueue.songLength));
+            queue.getItems().add(queueList.get(0));
         }
-//        Alert confirm = AlertMaker.AlertConfirmationMaker("Add to Queue", "Are you sure you want to add ? " 
-//                + selectedForAddition.getTitle() + " to queue?");
-//        Optional<ButtonType> answer = confirm.showAndWait();
-//        if(answer.get() == ButtonType.OK){
-//            FXMLMusicQueueController.addToQueue(selectedForAddition);
-//        }
-//        else {
-//            Alert simple = AlertMaker.AlertSimpleMaker("Addition Cancelled", "Song Addition Cancelled");
-//            simple.showAndWait();
-//        }
+    }
+    
+    @FXML
+    void handlePlaySong(ActionEvent event) {
+        selectedForAddition = queue.getSelectionModel().getSelectedItem().getSongID();
+        
+        if(selectedForAddition == null){
+            Alert error = AlertMaker.AlertErrorMaker("No Song Selected", "Please Select a Song to Play");
+            error.showAndWait();
+        }
+        else{
+            String songFile = FXMLMusicPlayerController.findSongFile(selectedForAddition);
+            String albumCover = FXMLMusicPlayerController.findAlbumCover(selectedForAddition);
+            String songName = queue.getSelectionModel().getSelectedItem().getTitle();
+            String songLen = queue.getSelectionModel().getSelectedItem().getSongLength();
+            String artistName = queue.getSelectionModel().getSelectedItem().getArtist();
+            FXMLMusicPlayerController.newSong(songFile, albumCover, songName, artistName, songLen);
+        }
     }
     
     @FXML
     void searchButtonAction(ActionEvent event) {
         if(searchBar.getText().equals("")){
-            oblist.clear();
+            searchList.clear();
             Alert a = AlertMaker.AlertErrorMaker("Search Missing", "Please Specify a Search");
             a.showAndWait();
         }
         else{
             try {
-                oblist.clear();
+                searchList.clear();
                 Connection conn = DBConnect.connectDB();
                 String sql = "SELECT * FROM SONGS_VW WHERE lower(SONGS_VW.title) LIKE '%" + searchBar.getText().toLowerCase() + "%' OR "
                         + "lower(SONGS_VW.artist) LIKE '%" + searchBar.getText().toLowerCase() + "%' OR "
@@ -143,27 +155,22 @@ public class FXMLMusicSearchController implements Initializable {
                 int rsCount = 0;
                 
                 while (rs.next()) {
-//                    System.out.println(rs.getString("song_id"));
-//                    System.out.println(rs.getString("album"));
-//                    System.out.println(rs.getString("title"));
-//                    System.out.println(rs.getString("artist"));
-//                    System.out.println(rs.getString("genre"));
-//                    System.out.println(rs.getString("song_length"));
-                    oblist.add(new ModelTable(rs.getString("song_id"), rs.getString("album"),  
+                    System.out.println("asdf");
+                    searchList.add(new ModelTable(rs.getString("song_id"), rs.getString("album"),  
                     rs.getString("title"), rs.getString("artist"),
                     rs.getString("genre"), rs.getString("song_length")));
                     rsCount ++;
                 }
-                
+                System.out.println("asdf2");
                 if (rsCount == 0){
                     Alert a = AlertMaker.AlertErrorMaker("Search Not Found", "Please Search Again");
                     a.showAndWait();
                 }
              
             } catch (Exception e) {
-                System.out.println(e);
+                e.printStackTrace();
             }
-        SongResult.setItems(oblist);
+        songResult.setItems(searchList);
         }
     }    
 }
